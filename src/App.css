@@ -1,0 +1,545 @@
+/* =============================================================================
+ * src/App.css — simple, framework-free styles for the todo UI
+ * =============================================================================
+ *
+ * Deliberately plain CSS (no Tailwind, no CSS-in-JS). The point is to see
+ * how components, state, and HTTP wire up — not to learn a styling tool.
+ *
+ * Author: Bill Chen
+ * ========================================================================== */
+
+:root {
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --accent: #4f46e5;
+    --accent-hover: #4338ca;
+    --danger: #ef4444;
+    --border: #e5e7eb;
+    --radius: 12px;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    min-height: 100vh;
+}
+
+.top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.top-nav__inner {
+    max-width: 1100px;
+    min-height: 4rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.top-nav__brand {
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.top-nav__menu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.25rem;
+}
+
+.top-nav__link,
+.top-nav__button {
+    padding: 0.4rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.top-nav__link:hover,
+.top-nav__link.is-active,
+.top-nav__button:hover {
+    color: var(--accent);
+}
+
+.top-nav__user {
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.top-nav__role {
+    color: var(--muted);
+}
+
+.top-nav__button {
+    padding: 0.55rem 0.85rem;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+}
+
+.top-nav__button:hover {
+    background: var(--accent-hover);
+    color: white;
+}
+
+.app {
+    max-width: 640px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    scroll-margin-top: 5rem;
+}
+
+.app--loading {
+    margin-top: 2.5rem;
+}
+
+.app__header h1 {
+    margin: 0;
+    font-size: 1.75rem;
+}
+
+.app__subtitle {
+    margin: 0.25rem 0 1.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+/* ---------- Form ---------- */
+.todo-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.todo-form input {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.todo-form input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.todo-form button {
+    padding: 0.6rem 1.2rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.todo-form button:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+
+.todo-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.projects {
+    margin-bottom: 1rem;
+}
+
+.dashboard-section + .dashboard-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.dashboard-section > h2 {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+}
+
+.project-form,
+.project-item__edit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.project-form {
+    margin-bottom: 1.5rem;
+}
+
+.project-form label,
+.project-item__edit label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.project-form input,
+.project-form textarea,
+.project-item__edit input,
+.project-item__edit textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    color: var(--text);
+}
+
+.project-form button,
+.project-item__actions button {
+    align-self: flex-start;
+    padding: 0.55rem 0.9rem;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    font: inherit;
+    cursor: pointer;
+}
+
+.project-form button:disabled,
+.project-item__actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.project-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem;
+    background: var(--bg);
+    border-radius: 8px;
+}
+
+.project-item__content {
+    min-width: 0;
+}
+
+.project-item__content h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.project-item__content p {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+    white-space: pre-wrap;
+}
+
+.project-item__actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.5rem;
+}
+
+.project-item__actions .project-item__delete {
+    background: var(--danger);
+}
+
+.project-item__edit {
+    width: 100%;
+}
+
+.project-form :focus-visible,
+.project-item :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.auth-panel {
+    max-width: 28rem;
+    margin: 2rem auto;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    color: var(--muted);
+}
+
+.auth-form input {
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    color: var(--text);
+}
+
+.auth-form button {
+    padding: 0.6rem 1rem;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    font: inherit;
+    cursor: pointer;
+}
+
+.auth-form button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.auth-switch {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.auth-switch__button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--accent);
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.top-nav :focus-visible,
+.auth-form :focus-visible,
+.auth-switch__button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+/* ---------- List ---------- */
+.todo-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    background: var(--bg);
+    border-radius: 8px;
+}
+
+.todo-item.is-done .todo-item__title {
+    text-decoration: line-through;
+    color: var(--muted);
+}
+
+.todo-item__title {
+    flex: 1;
+    cursor: pointer;
+    user-select: none;
+}
+
+.todo-item__edit {
+    flex: 1;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.todo-item__delete {
+    background: transparent;
+    border: none;
+    color: var(--danger);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.4rem;
+}
+
+.todo-item__delete:hover {
+    transform: scale(1.1);
+}
+
+/* ---------- Empty / error ---------- */
+.todo-empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 1.5rem 0;
+}
+
+.app__error {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+/* ---------- Footer ---------- */
+.app__footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+/* ---------- LocalStorage demo ---------- */
+.local-storage-demo {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.session-storage-demo {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.local-storage-demo__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.local-storage-demo__header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.local-storage-demo__description {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.local-storage-demo__reset {
+    flex-shrink: 0;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+}
+
+.local-storage-demo__reset:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.local-storage-demo :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.storage-comparison {
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--muted);
+}
+
+.storage-comparison h2 {
+    margin: 0 0 0.4rem;
+    color: var(--text);
+    font-size: 1.05rem;
+}
+
+.storage-comparison p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .top-nav__inner {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .top-nav__menu {
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.65rem;
+    }
+
+    .top-nav__link,
+    .top-nav__button,
+    .top-nav__user {
+        font-size: 0.85rem;
+    }
+
+    .top-nav__user {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .app {
+        margin: 1rem;
+        padding: 1.25rem;
+    }
+
+    .app__footer {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .project-item {
+        flex-direction: column;
+    }
+
+    .local-storage-demo__header {
+        flex-direction: column;
+    }
+}
