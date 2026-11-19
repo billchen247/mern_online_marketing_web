@@ -7,7 +7,7 @@ const originalWindow = globalThis.window;
 const storage = new Map();
 
 globalThis.window = {
-    localStorage: {
+    sessionStorage: {
         getItem(key) {
             return storage.get(key) ?? null;
         },
