@@ -1,6 +1,7 @@
 # Author: Bill Chen — frontend ignores.
 node_modules/
 package-lock.json
+yarn.lock
 dist/
 dist-ssr/
 *.local

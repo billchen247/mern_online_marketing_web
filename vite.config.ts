@@ -23,7 +23,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
     plugins: [react()],
     server: {
-        port: 80,
+        port: 5173,
         allowedHosts: ["mern-online-marketing-web.onrender.com"],
         proxy: {
             "/api": "https://mern-online-marketing-api.onrender.com/",
